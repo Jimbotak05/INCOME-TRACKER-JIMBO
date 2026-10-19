@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17251f">
+<title>JIMBO Income Tracker</title>
+<style>
+:root{--bg:#f4f6f2;--card:#fff;--ink:#17251f;--muted:#69756d;--lime:#c7f36b;--green:#477d35;--line:#e0e6df}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink)}
+header{background:var(--ink);color:white;padding:24px 18px 22px;border-radius:0 0 24px 24px}
+.brand{display:flex;align-items:center;gap:12px}.logo{background:var(--lime);color:var(--ink);width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:25px;font-weight:900}
+h1{font-size:21px;margin:0} .sub{font-size:12px;color:#cbd7ce;letter-spacing:1.2px;margin-top:3px}
+.hero-label{font-size:13px;color:#d2ded4;margin-top:24px}.hero{font-size:36px;font-weight:800;color:var(--lime);margin:3px 0 12px}
+.balance{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #405047;padding-top:12px;font-size:13px;color:#d2ded4}.balance strong{font-size:19px;color:white}
+main{max-width:650px;margin:auto;padding:16px 14px 40px}.tabs{display:flex;gap:7px;margin-bottom:15px}.tabs button{flex:1;padding:12px 6px;border:1px solid var(--line);border-radius:12px;background:white;color:var(--ink);font-weight:700}.tabs button.active{background:var(--ink);color:white;border-color:var(--ink)}
+.panel{display:none}.panel.active{display:block}.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:16px;margin-bottom:12px}
+h2{font-size:18px;margin:0 0 6px}.muted{color:var(--muted);font-size:13px;line-height:1.45}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.stat{background:#edf1e9;border-radius:12px;padding:10px}.stat span{display:block;color:var(--muted);font-size:11px}.stat strong{font-size:17px;display:block;margin-top:4px}
+.progress{height:8px;background:#e5e9e3;border-radius:99px;overflow:hidden;margin:10px 0 16px}.progress div{height:100%;background:#78a95b;width:0%;transition:width .2s}
+.days{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.day{border:1px solid var(--line);border-radius:13px;padding:11px 4px;background:white;text-align:center;color:var(--ink);min-height:82px}.day.done{background:#e3f5d8;border-color:#78a95b}.day .check{font-size:20px;display:block;color:#7c887e}.day.done .check{color:var(--green)}.day b{font-size:12px;display:block;margin:3px 0}.day small{font-size:11px;color:var(--muted)}
+label{display:block;font-size:13px;font-weight:650;margin:12px 0 5px}input,textarea{font:inherit;width:100%;padding:12px;border:1px solid #cfd8cf;border-radius:11px;background:#fff;color:var(--ink);outline-color:#78a95b}input[type=number]{appearance:textfield}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{border:1px solid var(--line);border-radius:12px;background:white;padding:12px 14px;font-weight:700;color:var(--ink);width:100%;margin-top:10px}.btn.primary{background:var(--ink);color:white;border-color:var(--ink)}.btn.danger{color:#a13c32}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 0;font-size:14px}.row strong{font-size:16px}.net{font-size:24px;color:var(--green);font-weight:800}.entry{border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:10px;background:white}
+.footer{text-align:center;color:var(--muted);font-size:11px;line-height:1.5;padding:12px}
+@media(min-width:520px){.days{grid-template-columns:repeat(6,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header>
+ <div class="brand"><div class="logo">J</div><div><h1>JIMBO</h1><div class="sub">INCOME TRACKER</div></div></div>
+ <div class="hero-label">Jumlah pendapatan terkumpul</div><div class="hero" id="total">RM0.00</div>
+ <div class="balance"><span>Baki selepas kos</span><strong id="balance">RM0.00</strong></div>
+</header>
+<main>
+ <nav class="tabs">
+  <button class="active" data-tab="checklist">Checklist</button><button data-tab="pendapatan">Pendapatan</button><button data-tab="rekod">Rekod</button>
+ </nav>
+ <section class="panel active" id="checklist">
+  <div class="card">
+   <h2>Misi 41 hari</h2><div class="muted">Tekan hari selepas selesai kerja Shopee. Data disimpan pada browser telefon ini.</div>
+   <div class="stats"><div class="stat"><span>Hari selesai</span><strong id="doneCount">0/41</strong></div><div class="stat"><span>Target Shopee</span><strong id="target">RM1,025</strong></div><div class="stat"><span>Progress</span><strong id="percent">0%</strong></div></div>
+   <div class="progress"><div id="bar"></div></div>
+   <div class="days" id="days"></div>
+   <button class="btn" id="copyChecklist">Salin checklist</button>
+  </div>
+ </section>
+ <section class="panel" id="pendapatan">
+  <div class="card">
+   <h2>Tetapan pendapatan</h2><div class="muted">Ubah nilai ikut jumlah sebenar. Semua jumlah dikira secara automatik.</div>
+   <label>Target Shopee sehari (RM)</label><input id="rate" type="number" min="0" step="0.50" value="25">
+   <div class="grid2"><div><label>Kerja mak ayah (RM)</label><input id="parents" type="number" min="0" step="1" value="0"></div><div><label>Yayunk (RM)</label><input id="yayunk" type="number" min="0" step="1" value="0"></div></div>
+   <button class="btn danger" id="resetIncome">Reset pendapatan</button>
+   <label>Kos barang memasak (RM)</label><input id="cost" type="number" min="0" step="1" value="200">
+   <div class="row"><span>Shopee terkumpul</span><strong id="shopeeTotal">RM0.00</strong></div>
+   <div class="row"><span>Pendapatan lain</span><strong id="otherTotal">RM1,200.00</strong></div>
+   <div class="row"><span>Kos</span><strong id="costTotal">−RM200.00</strong></div><hr style="border:0;border-top:1px solid var(--line)">
+   <div class="row"><span>Baki bersih anggaran</span><strong class="net" id="net">RM1,000.00</strong></div>
+  </div>
+ </section>
+ <section class="panel" id="rekod">
+  <div class="card"><h2>Rekod harian</h2><div class="muted">Tandakan hari dalam Checklist dahulu, kemudian isi pendapatan sebenar dan catatan di sini.</div><div id="entries"></div><button class="btn" id="copyRecords">Salin rekod pendapatan</button></div>
+ </section>
+ <div class="footer">JIMBO Income Tracker · Simpanan setempat pada browser telefon. Jika clear data browser atau tukar telefon, rekod mungkin hilang. Eksport rekod secara berkala.</div>
+</main>
+<script>
+const KEY='jimbo-income-tracker-v1';
+const defaults={rate:25,parents:0,yayunk:0,cost:200,days:[],income:{},notes:{}};
+let data;
+try{data={...defaults,...JSON.parse(localStorage.getItem(KEY)||'{}')};}catch(e){data={...defaults};}
+const $=id=>document.getElementById(id);
+const money=n=>'RM'+Number(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
+const num=id=>Math.max(0,Number($(id).value)||0);
+function save(){localStorage.setItem(KEY,JSON.stringify(data));render();}
+function shopeeTotal(){return data.days.reduce((s,d)=>s+Number(data.income[d]??data.rate),0)}
+function render(){
+ $('rate').value=data.rate;$('parents').value=data.parents;$('yayunk').value=data.yayunk;$('cost').value=data.cost;
+ const shop=shopeeTotal(),other=Number(data.parents)+Number(data.yayunk),cost=Number(data.cost),net=shop+other-cost;
+ $('total').textContent=money(shop+other);$('balance').textContent=money(net);
+ $('shopeeTotal').textContent=money(shop);$('otherTotal').textContent=money(other);$('costTotal').textContent='−'+money(cost);$('net').textContent=money(net);
+ $('target').textContent=money(41*Number(data.rate));$('doneCount').textContent=data.days.length+'/41';$('percent').textContent=Math.round(data.days.length/41*100)+'%';$('bar').style.width=(data.days.length/41*100)+'%';
+ $('days').innerHTML='';
+ for(let d=1;d<=41;d++){const done=data.days.includes(d),b=document.createElement('button');b.className='day'+(done?' done':'');b.innerHTML=`<span class="check">${done?'✓':'○'}</span><b>Hari ${d}</b><small>${done?money(data.income[d]??data.rate):'Belum'}</small>`;b.onclick=()=>{data.days=done?data.days.filter(x=>x!==d):[...data.days,d].sort((a,b)=>a-b);save();};$('days').appendChild(b);}
+ $('entries').innerHTML='';
+ if(!data.days.length){$('entries').innerHTML='<p class="muted" style="margin-top:15px">Belum ada hari selesai. Tick hari pertama dalam tab Checklist.</p>';}
+ [...data.days].sort((a,b)=>a-b).forEach(d=>{
+  const div=document.createElement('div');div.className='entry';
+  div.innerHTML=`<strong>Hari ${d}</strong><label>Pendapatan sebenar (RM)</label><input type="number" min="0" step="0.50" data-income="${d}" value="${data.income[d]??data.rate}"><label>Catatan</label><input data-note="${d}" value="${escapeHtml(data.notes[d]||'')}" placeholder="Contoh: 5 order / hujan">`;
+  $('entries').appendChild(div);
+ });
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+['rate','parents','yayunk','cost'].forEach(id=>$(id).addEventListener('change',()=>{data[id==='parents'?'parents':id==='yayunk'?'yayunk':id]=num(id);save();}));
+document.addEventListener('change',e=>{if(e.target.dataset.income){data.income[e.target.dataset.income]=Math.max(0,Number(e.target.value)||0);save();}if(e.target.dataset.note){data.notes[e.target.dataset.note]=e.target.value;localStorage.setItem(KEY,JSON.stringify(data));}});
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab));if(b.dataset.tab==='rekod')render();});
+$('resetIncome').onclick=()=>{if(confirm('Reset pendapatan kerja mak ayah dan Yayunk kepada RM0? Checklist dan rekod harian tidak akan dipadam.')){data.parents=0;data.yayunk=0;save();$('resetIncome').textContent='Pendapatan direset ke RM0';}};
+$('copyChecklist').onclick=async()=>{const s=Array.from({length:41},(_,i)=>`${data.days.includes(i+1)?'☑':'☐'} Hari ${i+1} — ${data.days.includes(i+1)?money(data.income[i+1]??data.rate):'Belum'}`).join('\n');await navigator.clipboard.writeText(s).catch(()=>{});$('copyChecklist').textContent='Checklist disalin (jika disokong)';};
+$('copyRecords').onclick=async()=>{const s=[...data.days].sort((a,b)=>a-b).map(d=>`Hari ${d}: ${money(data.income[d]??data.rate)}${data.notes[d]?' — '+data.notes[d]:''}`).join('\n');try{await navigator.clipboard.writeText(s);$('copyRecords').textContent='Rekod disalin!';}catch(e){prompt('Salin rekod ini:',s)}};
+render();
+</script>
+</body>
+</html>
